@@ -20,35 +20,68 @@
 
 
 #include <math.h>
+#include <vector>
 
 
 #include "stdafx.h"
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity);
 
+
+struct Point3
+{
+    double x;
+    double y;
+    double z;
+};
+
+vector<Point3> mkVector(double func(double))
+{
+    vector<Point3> Points;
+    for (double phi = 0; phi < 2 * PI; phi += PI / 20)
+    {   
+        double r = func(phi);
+        double x = r * cos(phi);
+        double y = r * sin(phi);
+        double z = phi / 2 / PI;
+        Points.push_back(Point3{ x,y,z });
+    }
+    return Points;
+}
+
+double func(double phi)
+{
+    return sin(phi) / cos(phi);
+}
+
 void helloNrxCmd()
 {
-    AcDbObjectId lineId;
-    AcDbObjectId line2Id;
-    AcDbObjectId line3Id;
-    AcDbObjectId line4Id;
-    AcDbObjectId line5Id;
-    AcDbObjectId line6Id;
-    AcDbObjectId line7Id;
-    AcDbObjectId line8Id;
-    AcDbObjectId lel[8] = { lineId, line2Id,line3Id,line4Id,line5Id,line6Id, line7Id, line8Id};
-    const int n = 20;
-    double lol[n] = {14.7372,-55,-127,-55,-167,-15,-167,112,-119,152,-69,65,-19,152,55, 95.2628, 0,0};
-    for(int i=0; i < n-6; i+=2)
+    AcDbObjectId* myIDs = new AcDbObjectId; 
+    //vector <AcDbObjectId> myIDs;
+    
+
+    while (int i = 0 < 40)
     {
-        AcDbLine* pLine = new AcDbLine(AcGePoint3d(lol[i], lol[i+1], 0), AcGePoint3d(lol[i+2], lol[i + 3 ], 0));
-        addToModelSpace(lel[i/2], pLine);
+        myIDs[i] = AcDbObjectId();
+        //myIDs.push_back(AcDbObjectId());
+        i++;
+    }
+
+    vector<Point3> Points = mkVector(&func);
+
+    for(int i=0; i < 39; i++)
+    {
+        Point3 currPoint = Points[i];
+        Point3 nextPoint = Points[i++];
+        AcDbLine* pLine = new AcDbLine(AcGePoint3d(currPoint.x, currPoint.y, currPoint.z), AcGePoint3d(nextPoint.x, nextPoint.y, nextPoint.z));
+        addToModelSpace(myIDs[i], pLine);
 
         pLine->close();
     }
 
+    delete[] myIDs;
 
-    AcDbObjectId line9Id;
+   /* AcDbObjectId line9Id;
     AcDbObjectId line10Id;
     AcDbObjectId line11Id;
     AcDbObjectId lel1[3] = { line9Id, line10Id,line11Id };
@@ -60,14 +93,18 @@ void helloNrxCmd()
         addToModelSpace(lel1[i / 2], pLine);
 
         pLine->close();
-    }
+    }*/
 
-    AcDbObjectId circle1Id;
+
+
+
+
+    /*AcDbObjectId circle1Id;
 
     AcDbCircle* circle = new AcDbCircle(AcGePoint3d(-130,80,0), AcGeVector3d::kZAxis, 25);
 
     addToModelSpace(circle1Id, circle);
-    circle->close();
+    circle->close();*/
 
 
     ////int i = 0;
@@ -114,7 +151,7 @@ void helloNrxCmd()
     ////AcDbArc* arc = new AcDbArc(AcGePoint3d(110, 0, 0), AcGePoint3d(110, 0, 0), 5);
     //AcDbArc* arc = new AcDbArc;
 
-    AcGePoint3d center(110, 0.0, 0.0);
+    /*AcGePoint3d center(110, 0.0, 0.0);
     double radius = 110;
     double startAngle = PI / 6 * 4;
     double endAngle = PI / 6 / 2 * 14;
@@ -122,7 +159,7 @@ void helloNrxCmd()
     AcDbArc* arc = new AcDbArc(center, radius, startAngle, endAngle);
 
     addToModelSpace(arcId, arc);
-    arc->close();
+    arc->close();*/
 }
 
 

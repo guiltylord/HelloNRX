@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Program Files\\Nanosoft\\nanoCAD x64 24.0\\SDK\\samples\\NRX\\HelloNRX\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A8C63A28-5D03-46F9-AF7E-343C56980B60}|HelloNRX.vcxproj|C:\\Program Files\\Nanosoft\\nanoCAD x64 24.0\\SDK\\samples\\NRX\\HelloNRX\\HelloNRX.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A8C63A28-5D03-46F9-AF7E-343C56980B60}|HelloNRX.vcxproj|solutionrelative:HelloNRX.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{f5cd1b51-c771-5648-966f-646d419b1e7c}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HelloNRX.cpp",
+              "DocumentMoniker": "C:\\Program Files\\Nanosoft\\nanoCAD x64 24.0\\SDK\\samples\\NRX\\HelloNRX\\HelloNRX.cpp",
+              "RelativeDocumentMoniker": "HelloNRX.cpp",
+              "ToolTip": "C:\\Program Files\\Nanosoft\\nanoCAD x64 24.0\\SDK\\samples\\NRX\\HelloNRX\\HelloNRX.cpp",
+              "RelativeToolTip": "HelloNRX.cpp",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-02-22T11:31:11.326Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
