@@ -1,3 +1,5 @@
 ﻿  stdafx.cpp
        Compiling header files in release mode.
-C:\Program Files\Nanosoft\nanoCAD x64 24.0\SDK\samples\NRX\HelloNRX\stdafx.h(51,10): fatal  error C1083: Не удается открыть файл включение: arxHeaders.h: No such file or directory,
+C:\Program Files\Nanosoft\nanoCAD x64 24.0\SDK\samples\NRX\HelloNRX\stdafx.h(51,10): error C1083: Не удается открыть файл включение: arxHeaders.h: No such file or directory,
+  (компиляция исходного файла "stdafx.cpp")
+  

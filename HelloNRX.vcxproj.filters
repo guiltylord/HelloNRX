@@ -18,12 +18,24 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="calcArc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="storageObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HelloNRX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="calcArc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="storageObj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
