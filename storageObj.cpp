@@ -31,11 +31,28 @@ vector<AcDbObjectId> storageObj::mkAcIDs(int neededSize)
 	return vec;
 }
 
-static AcDbObjectId GetPrevID(AcDbObjectId currID)
+AcDbObjectId storageObj::GetPrevID(AcDbObjectId currID)
 {
 	//проверка на концы
+	for (int i = 0; i<countPoint-1; i++)
+	{
+		{
+			if (vecId[i] == currID && i != 0)
+				return vecId[i-1];
+			if (vecId[i] == currID && i == 0)
+				return vecId[countPoint-1];
+		}
+	}
 }
-static AcDbObjectId GetNextID(AcDbObjectId currID)
+
+AcDbObjectId storageObj::GetNextID(AcDbObjectId currID)
 {
 	//проверка на концы
+	for (int i = 0; i<countPoint-1; i++)
+	{
+		if (vecId[i] == currID && i != countPoint-1)
+			return vecId[i+1];
+		if (vecId[i] == currID && i == countPoint-1)
+			return vecId[0];
+	}
 }

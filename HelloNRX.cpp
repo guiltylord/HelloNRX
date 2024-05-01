@@ -5,21 +5,112 @@
 #include <iostream>
 #include "calcArc.h"
 #include "storageObj.h"
-#include <fstream>
 using namespace calcArc;
 
 
 using namespace std;
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity);
+vector<AcDbObjectId> IDs;
+storageObj myObj = storageObj();
+
+class LineReactor : public NcDbObjectReactor
+{
+public:
 
 
+    /*double x1, y1, z1;
+    double x2, y2, z2;*/
+
+    NcGePoint3d startPoint1 = NcGePoint3d(0, 0, 0);
+    NcGePoint3d endPoint1 = NcGePoint3d(100, 100, 0);
+    NcGePoint3d startPoint2 = endPoint1;
+    NcGePoint3d endPoint2 = NcGePoint3d(150, 50, 0);
+
+    void modified(const NcDbObject* object)
+    {
+        NcDbLine* pLine = NcDbLine::cast(object);
+        NcDbObject* object2;
+        acdbOpenObject(object2, IDs[1], kForWrite);
+
+        NcDbLine* pLine2 = NcDbLine::cast(object2);
+
+        if (pLine == NULL)
+            return;
+
+        if (IDs.size() < 2)
+            return;
+
+        int sizeList = IDs.size();
+
+        for (int i = 0; i < sizeList; i++)
+        {
+            if (object->objectId() == IDs[i])
+            {
+                /*switch (i)
+                {
+                case 0:
+                    if (pLine != nullptr)
+                    {
+                        pLine->setStartPoint(NcGePoint3d(0, 0, 0));
+                        pLine->setEndPoint(NcGePoint3d(100, 100, 0));
+                    }
+                    break;
+                case 1:
+                    if (pLine != nullptr)
+                    {
+                        pLine->setStartPoint(NcGePoint3d(100, 100, 0));
+                        pLine->setEndPoint(NcGePoint3d(150, 50, 0));
+                    }
+                    break;
+                default:
+                    break;
+                }*/
+
+                switch (i)
+                {
+                case 0:
+
+                    if (pLine != nullptr)
+                    {
+                        /*AcDbObjectId ID = IDs[1];
+                          NcDbLine = ID->objectId();
+                          NcDbLine* pLine2 = NcDbLine::cast();*/
+                        pLine->setStartPoint(NcGePoint3d(0, 0, 0));
+
+                        //есть getStartPoint()
+                        //
+                        // 
+                        // 
+                        // 
+                        // 
+
+                        //pLine->setEndPoint(NcGePoint3d(100, 100, 0)); 
+                    }
+                    break;
+                case 1:
+                    if (pLine != nullptr)
+                    {
+                        pLine->setStartPoint(NcGePoint3d(100, 100, 0));
+                        pLine->setEndPoint(NcGePoint3d(150, 50, 0));
+                    }
+                    break;
+                default:
+                    break;
+                }
+                break;
+            }
+        }
+    }
+};
+
+LineReactor* myReactor;
 
 
 void helloNrxCmd()
 {
 	//нужны методы получить пред и след, вектор для этого есть. и желательно запихнуть это в класс
-	storageObj myObj = storageObj();
+	
 	
 	//делаю контур
 	for (int i = 0; i < myObj.countPoint-1; i++)
