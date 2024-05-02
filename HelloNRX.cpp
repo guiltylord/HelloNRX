@@ -37,7 +37,7 @@ void helloNrxCmd()
 		pLine->close();
         myObj.countPoint++;
 	}
-
+	  
 	//right arc
 	//AcGePoint3d pointStartAngleArc = myObj.vecPoint[myObj.countPoint - 1]; 
 	//AcGePoint3d pointEndAngleArc = myObj.vecPoint[0];
@@ -79,58 +79,12 @@ void LineReactor::modified(const NcDbObject* object)
     {
         if (object->objectId() == myObj.vecId[i])
         {
-            /*switch (i)
-            {
-            case 0:
-                if (pLine != nullptr)
-                {
-                    pLine->setStartPoint(NcGePoint3d(0, 0, 0));
-                    pLine->setEndPoint(NcGePoint3d(100, 100, 0));
-                }
-                break;
-            case 1:
-                if (pLine != nullptr)
-                {
-                    pLine->setStartPoint(NcGePoint3d(100, 100, 0));
-                    pLine->setEndPoint(NcGePoint3d(150, 50, 0));
-                }
-                break;
-            default:
-                break;
-            }*/
-            myObj.flag = true;
-            //switch (i)
-            //{
-            //case 0:
-
-            //    if (pLine != nullptr)
-            //    {
-            //        /*AcDbObjectId ID = IDs[1];
-            //          NcDbLine = ID->objectId();
-            //          NcDbLine* pLine2 = NcDbLine::cast();*/
-            //        pLine->setStartPoint(NcGePoint3d(0, 0, 0));
-
-            //        //есть getStartPoint()
-            //        //
-            //        // 
-            //        // 
-            //        // 
-            //        // 
-
-            //        //pLine->setEndPoint(NcGePoint3d(100, 100, 0)); 
-            //    }
-            //    break;
-            //case 1:
-            //    if (pLine != nullptr)
-            //    {
-            //        pLine->setStartPoint(NcGePoint3d(100, 100, 0));
-            //        pLine->setEndPoint(NcGePoint3d(150, 50, 0));
-            //    }
-            //    break;
-            //default:
-            //    break;
-            //}
-            //break;
+            //myObj.isModifying = true;
+            pLine2->setEndPoint(pLine->startPoint());
+            pLine3->setStartPoint(pLine->endPoint());
+            //видимо на этом моменте начинается бесконечный вызов modified из-за изменения object2, object3(двух других линий)
+			return;
+            
         }
     }
 }
@@ -176,3 +130,5 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* appId)
 
 	return AcRx::kRetOK;
 }
+
+

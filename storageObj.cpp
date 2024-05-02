@@ -6,7 +6,7 @@ storageObj::storageObj()
 	vecPoint = mkPoints();
     countPoint = 0;
 	vecId = mkAcIDs(vecPoint.size());
-    flag = false;
+    isModifying = false;
 }
 
 

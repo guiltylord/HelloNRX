@@ -7,7 +7,7 @@ public:
 	vector<AcGePoint3d> vecPoint;
 	vector<AcDbObjectId> vecId;
 	int countPoint;
-	bool flag;
+	bool isModifying;
 	
 	AcDbObjectId GetPrevID(AcDbObjectId currID);
 	AcDbObjectId GetNextID(AcDbObjectId currID);
