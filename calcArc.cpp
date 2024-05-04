@@ -111,5 +111,5 @@ namespace calcArc
 		AcGePoint3d center = M + direction * OM;
 
 		return center;
-	}	
+	}
 };

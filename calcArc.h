@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "stdafx.h"
 
 namespace calcArc
 {
@@ -9,4 +8,3 @@ namespace calcArc
 	//вычисляет центр окружности через две точки на дуге и радиус
 	AcGePoint3d findCircleCenter(AcGePoint3d A, AcGePoint3d B, double radius);
 };
-

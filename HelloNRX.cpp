@@ -1,5 +1,4 @@
-﻿#include <math.h>
-#include <vector>
+﻿#include <vector>
 
 #include "stdafx.h"
 #include <iostream>
@@ -12,12 +11,13 @@ using namespace std;
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity);
 vector<AcDbObjectId> IDs;
-storageObj myObj= storageObj();
+storageObj myObj = storageObj();
 
 class LineReactor : public NcDbObjectReactor
 {
 public:
 	void modified(const NcDbObject* object);
+	int counter = 0;
 };
 
 LineReactor* myReactor;
@@ -27,66 +27,78 @@ void helloNrxCmd()
 {
 	//делаю контур
 
-    //storageObj myObj = storageObj();
-	for (int i = 0; i < myObj.vecId.size(); i++)
+	//storageObj myObj = storageObj();
+	for (int i = 0; i < myObj.vecId.size()-1; i++)
 	{
 
 		AcDbLine* pLine = new AcDbLine(myObj.vecPoint[i], myObj.vecPoint[i + 1]);
 		addToModelSpace(myObj.vecId[i], pLine);
-        pLine->addReactor(myReactor);
+		pLine->addReactor(myReactor);
 		pLine->close();
-        myObj.countPoint++;
+		myObj.countPoint++;
 	}
-	  
+
 	//right arc
-	//AcGePoint3d pointStartAngleArc = myObj.vecPoint[myObj.countPoint - 1]; 
-	//AcGePoint3d pointEndAngleArc = myObj.vecPoint[0];
-	//double radiusArc = 110;
+	AcGePoint3d pointStartAngleArc = myObj.vecPoint[myObj.countPoint]; 
+	AcGePoint3d pointEndAngleArc = myObj.vecPoint[0];
+	double radiusArc = 110;
 
-	//AcGePoint3d center = findCircleCenter(pointStartAngleArc, pointEndAngleArc, radiusArc);
+	AcGePoint3d center = findCircleCenter(pointStartAngleArc, pointEndAngleArc, radiusArc);
 
-	//double startAngle = calculateFullAngle(center, pointStartAngleArc);
-	//double endAngle = calculateFullAngle(center, pointEndAngleArc);
-	//
-	//AcDbArc* arc = new AcDbArc(center, radiusArc, startAngle, endAngle);
+	double startAngle = calculateFullAngle(center, pointStartAngleArc);
+	double endAngle = calculateFullAngle(center, pointEndAngleArc);
+	
+	AcDbArc* arc = new AcDbArc(center, radiusArc, startAngle, endAngle);
 
-	//addToModelSpace(myObj.vecId[myObj.countPoint - 1], arc);//тут возможно будет проблема с айдишниками #теперь не должно
-	//arc->close();	
+	addToModelSpace(myObj.vecId[myObj.countPoint], arc);
+	myObj.countPoint++;
+	arc->addReactor(myReactor);
+	arc->close();	
 }
 
 void LineReactor::modified(const NcDbObject* object)
 {
-    NcDbLine* pLine = NcDbLine::cast(object);
+	NcDbLine* pLine = NcDbLine::cast(object);
 
-    if (pLine == NULL)
-        return;
+	if (pLine == NULL)
+		return;
 
-    if (myObj.countPoint <= 7)
-        return;
+	if (myObj.countPoint <= 7)
+		return;
 
-    NcDbObject* object2;
-    AcDbObjectId currId = object->id();
-    AcDbObjectId secId = myObj.GetPrevID(currId);
-    acdbOpenObject(object2, secId, kForWrite);
-    NcDbLine* pLine2 = NcDbLine::cast(object2);
+	AcDbObjectId currId = object->id();
 
-    NcDbObject* object3;
-    AcDbObjectId thrdId = myObj.GetNextID(object->id());
-    acdbOpenObject(object3, thrdId, kForWrite);
-    NcDbLine* pLine3 = NcDbLine::cast(object3);
 
-    for (int i = 0; i < myObj.countPoint-1; i++)
-    {
-        if (object->objectId() == myObj.vecId[i])
-        {
-            //myObj.isModifying = true;
-            pLine2->setEndPoint(pLine->startPoint());
-            pLine3->setStartPoint(pLine->endPoint());
-            //видимо на этом моменте начинается бесконечный вызов modified из-за изменения object2, object3(двух других линий)
+	if (myObj.currId == nullptr)
+		myObj.currId = currId;
+	else
+	{
+		myReactor->counter++;
+		if (myReactor->counter == 2)
+		{
+			myReactor->counter = 0;
+			myObj.currId = nullptr;
 			return;
-            
-        }
-    }
+		}
+		return;
+	}
+
+	NcDbObject* object2;
+	AcDbObjectId secId = myObj.GetPrevID(currId);
+	Nano::ErrorStatus errorr1 = acdbOpenObject(object2, secId, kForWrite);
+	NcDbLine* pLine2 = NcDbLine::cast(object2);
+
+	NcDbObject* object3;
+	AcDbObjectId thrdId = myObj.GetNextID(currId);
+	Nano::ErrorStatus errorr2 = acdbOpenObject(object3, thrdId, kForWrite);
+	NcDbLine* pLine3 = NcDbLine::cast(object3);
+	//NcDbArc* pLine3 = NcDbArc::cast(object3);
+
+	NcGePoint3d test1 = pLine->startPoint();
+	NcGePoint3d test2 = pLine->endPoint();
+	pLine2->setEndPoint(test1);
+	pLine3->setStartPoint(test2);
+	//дописать дугу тблядб
 }
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity)
@@ -113,7 +125,7 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* appId)
 		acrxDynamicLinker->unlockApplication(appId);
 		acrxDynamicLinker->registerAppMDIAware(appId);
 
-        myReactor = new LineReactor;
+		myReactor = new LineReactor;
 		acedRegCmds->addCommand(L"HELLONRX_GROUP",
 			L"_HELLONRX",
 			L"HELLONRX",
@@ -123,12 +135,10 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* appId)
 
 	case AcRx::kUnloadAppMsg:
 		acedRegCmds->removeGroup(L"HELLONRX_GROUP");
-        delete myReactor;
+		delete myReactor;
 		break;
 
 	}
 
 	return AcRx::kRetOK;
 }
-
-
