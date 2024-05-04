@@ -39,29 +39,28 @@ void helloNrxCmd()
 	}
 
 	//right arc
-	AcGePoint3d pointStartAngleArc = myObj.vecPoint[myObj.countPoint]; 
+	AcGePoint3d pointStartAngleArc = myObj.vecPoint[myObj.countPoint];
 	AcGePoint3d pointEndAngleArc = myObj.vecPoint[0];
 	double radiusArc = 110;
 
-	AcGePoint3d center = findCircleCenter(pointStartAngleArc, pointEndAngleArc, radiusArc);
+	AcGePoint3d center = findCircleCenter(pointStartAngleArc, pointEndAngleArc, radiusArc, -1);
 
 	double startAngle = calculateFullAngle(center, pointStartAngleArc);
 	double endAngle = calculateFullAngle(center, pointEndAngleArc);
-	
+
 	AcDbArc* arc = new AcDbArc(center, radiusArc, startAngle, endAngle);
 
 	addToModelSpace(myObj.vecId[myObj.countPoint], arc);
 	myObj.countPoint++;
 	arc->addReactor(myReactor);
-	arc->close();	
+	arc->close();
 }
 
 void LineReactor::modified(const NcDbObject* object)
 {
+	NcDbArc* pArc = NcDbArc::cast(object);
 	NcDbLine* pLine = NcDbLine::cast(object);
 
-	if (pLine == NULL)
-		return;
 
 	if (myObj.countPoint <= 7)
 		return;
@@ -86,29 +85,110 @@ void LineReactor::modified(const NcDbObject* object)
 	NcDbObject* object2;
 	AcDbObjectId secId = myObj.GetPrevID(currId); //previous
 	Nano::ErrorStatus errorr1 = acdbOpenObject(object2, secId, kForWrite);
-	
+
 	NcDbObject* object3;
 	AcDbObjectId thrdId = myObj.GetNextID(currId); //next
 	Nano::ErrorStatus errorr2 = acdbOpenObject(object3, thrdId, kForWrite);
 
 	if (currId == myObj.vecId[6])
 	{
+		NcDbObject* object4;
+		AcDbObjectId frthId = myObj.vecId[0]; //next
+		Nano::ErrorStatus errorr2 = acdbOpenObject(object4, frthId, kForWrite);
+
 		NcDbLine* pLine2 = NcDbLine::cast(object2);
 		NcDbArc* pLine3 = NcDbArc::cast(object3);
+		NcDbLine* pLine4 = NcDbLine::cast(object4);
+
+		NcGePoint3d test1 = pLine->startPoint();
+		NcGePoint3d test2 = pLine->endPoint();
+		NcGePoint3d test3 = pLine4->startPoint();
+		pLine2->setEndPoint(test1);
+		int radius = 110;
+		while(true)
+		{
+			AcGePoint3d center = findCircleCenter(test2, test3, radius, -1);
+			double startAngle = calculateFullAngle(center, test2);
+			double endAngle = calculateFullAngle(center, test3);
+			//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
+			pLine3->setCenter(center);
+			pLine3->setStartAngle(startAngle);
+			pLine3->setEndAngle(endAngle);
+			pLine3->setRadius(radius);
+			if ((calculatePointOnArc(pLine3->center(), radius, pLine3->startAngle()) == pLine->endPoint()) && (calculatePointOnArc(pLine3->center(), radius, pLine3->endAngle()) == test3))
+			{
+				break;
+			}
+			radius++;
+		}
+		return;
+	}
+
+	if (currId == myObj.vecId[0])
+	{
+		NcDbObject* object4;
+		AcDbObjectId frthId = myObj.vecId[6]; //next
+		Nano::ErrorStatus errorr2 = acdbOpenObject(object4, frthId, kForWrite);
+
+		NcDbLine* pLine3 = NcDbLine::cast(object3);
+		NcDbArc* pLine2 = NcDbArc::cast(object2);
+		NcDbLine* pLine4 = NcDbLine::cast(object4);
+
+		NcGePoint3d test1 = pLine->startPoint();
+		NcGePoint3d test2 = pLine->endPoint();
+		NcGePoint3d test3 = pLine4->endPoint();
+		pLine3->setStartPoint(test2);
+
+
+		int radius = 110;
+		AcGePoint3d center = findCircleCenter(test2, test3, radius, -1);
+		double startAngle = calculateFullAngle(center, test3);
+		double endAngle = calculateFullAngle(center, test1);
+		//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
+		pLine2->setCenter(center);
+		pLine2->setStartAngle(startAngle);
+		pLine2->setEndAngle(endAngle);
+		pLine2->setRadius(radius);
+		//need fix
+	
+		//while (true)
+		//{
+		//	AcGePoint3d center = findCircleCenter(test2, test3, radius, -1);
+		//	double startAngle = calculateFullAngle(center, test3);
+		//	double endAngle = calculateFullAngle(center, test1);
+		//	//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
+		//	pLine2->setCenter(center);
+		//	pLine2->setStartAngle(startAngle);
+		//	pLine2->setEndAngle(endAngle);
+		//	pLine2->setRadius(radius);
+		//	if ((calculatePointOnArc(pLine2->center(), radius, pLine2->startAngle()) == pLine4->endPoint()) && (calculatePointOnArc(pLine2->center(), radius, pLine2->endAngle()) == test1))
+		//	{
+		//		break;
+		//	}
+		//	radius++;
+		//}
+		return;
+	}
+
+	if (currId == myObj.vecId[7])
+	{
+		NcDbLine* pLine2 = NcDbLine::cast(object2);
+		NcDbLine* pLine3 = NcDbLine::cast(object3);
+		
+		pLine2->setEndPoint(calculatePointOnArc(pArc->center(), 110, pArc->startAngle()));
+		pLine3->setStartPoint(calculatePointOnArc(pArc->center(), 110, pArc->endAngle()));
+		return;
+	}
+	else
+	{
+		NcDbLine* pLine2 = NcDbLine::cast(object2);
+		NcDbLine* pLine3 = NcDbLine::cast(object3);
 
 		NcGePoint3d test1 = pLine->startPoint();
 		NcGePoint3d test2 = pLine->endPoint();
 		pLine2->setEndPoint(test1);
-		AcGePoint3d center = findCircleCenter(pLine->endPoint(), myObj.vecPoint[0], 110);
-		double startAngle = calculateFullAngle(center, pLine->endPoint());
-		double endAngle = calculateFullAngle(center, myObj.vecPoint[0]);
-		//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
-		pLine3->setCenter(center);
-		pLine3->setStartAngle(startAngle);
-		pLine3->setEndAngle(endAngle);
-		return;
+		pLine3->setStartPoint(test2);
 	}
-
 
 	
 
@@ -130,10 +210,7 @@ void LineReactor::modified(const NcDbObject* object)
 	//	}
 	//	if (true)//вариант,когда линия-линия-линия
 	//	{
-	//		NcGePoint3d test1 = pLine->startPoint();
-	//		NcGePoint3d test2 = pLine->endPoint();
-	//		pLine2->setEndPoint(test1);
-	//		pLine3->setStartPoint(test2);
+	//		
 	//	}
 	//}
 }

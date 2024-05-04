@@ -86,7 +86,7 @@ namespace calcArc
 	}
 
 
-	AcGePoint3d findCircleCenter(AcGePoint3d A, AcGePoint3d B, double radius)
+	AcGePoint3d findCircleCenter(AcGePoint3d A, AcGePoint3d B, double radius, int side)
 	{
 		// Midpoint of chord AB
 		AcGePoint3d M = AcGePoint3d((B.x + A.x) / 2.0, (B.y + A.y) / 2.0, 0);
@@ -95,10 +95,9 @@ namespace calcArc
 		double chordLength = AcGeVector3d(A - B).length();
 
 		// Distance from midpoint M to the circle center O
-		double OM = sqrt(radius * radius - (chordLength / 2.0) * (chordLength / 2.0));
+		double OM = sqrt(abs(radius * radius - (chordLength / 2.0) * (chordLength / 2.0)));
 
 		//определяет, где будет центр относительно хорды
-		int side = -1;
 
 		// Direction of the perpendicular to chord AB
 		AcGeVector3d AB = AcGeVector3d(side * (A - B));
@@ -111,5 +110,16 @@ namespace calcArc
 		AcGePoint3d center = M + direction * OM;
 
 		return center;
+	}
+	
+	AcGePoint3d calculatePointOnArc(AcGePoint3d center, double radius, double angleRadians)
+	{
+		// Вычисление декартовых координат для точки на окружности
+		AcGePoint3d pointOnArc;
+		pointOnArc.x = center.x + cos(angleRadians) * radius;
+		pointOnArc.y = center.y + sin(angleRadians) * radius;
+		pointOnArc.z = center.z; // z-координата не изменяется, если дуга находится в плоскости XY
+
+		return pointOnArc;
 	}
 };

@@ -3,7 +3,7 @@
 ################################################################################
 
 *.vsidx
-/.vs/HelloNRX/v17/ipch/4d4ffad4bf66f15b.ipch
+/.vs/
 /.vs/HelloNRX/v17/.suo
 /.vs/HelloNRX/v17/.wsuo
 /.vs/HelloNRX/v17/Browse.VC.db
