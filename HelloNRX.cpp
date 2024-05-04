@@ -92,13 +92,29 @@ void LineReactor::modified(const NcDbObject* object)
 	AcDbObjectId thrdId = myObj.GetNextID(currId);
 	Nano::ErrorStatus errorr2 = acdbOpenObject(object3, thrdId, kForWrite);
 	NcDbLine* pLine3 = NcDbLine::cast(object3);
-	//NcDbArc* pLine3 = NcDbArc::cast(object3);
-
-	NcGePoint3d test1 = pLine->startPoint();
-	NcGePoint3d test2 = pLine->endPoint();
-	pLine2->setEndPoint(test1);
-	pLine3->setStartPoint(test2);
-	//дописать дугу тблядб
+	AcDbObjectId* someId = new AcDbObjectId(); //нужный айди объекта, чтобы определить дугу
+	if (currId == *someId)
+	{
+		if (true)//вариант,когда линия-линия-дуга
+		{
+			return;
+		}
+		if (true)//вариант,когда линия-дуга-линия
+		{
+			return;
+		}
+		if (true)//вариант,когда дуга-линия-линия
+		{
+			return;
+		}
+		if (true)//вариант,когда линия-линия-линия
+		{
+			NcGePoint3d test1 = pLine->startPoint();
+			NcGePoint3d test2 = pLine->endPoint();
+			pLine2->setEndPoint(test1);
+			pLine3->setStartPoint(test2);
+		}
+	}
 }
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity)
