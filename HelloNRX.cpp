@@ -84,37 +84,58 @@ void LineReactor::modified(const NcDbObject* object)
 	}
 
 	NcDbObject* object2;
-	AcDbObjectId secId = myObj.GetPrevID(currId);
+	AcDbObjectId secId = myObj.GetPrevID(currId); //previous
 	Nano::ErrorStatus errorr1 = acdbOpenObject(object2, secId, kForWrite);
-	NcDbLine* pLine2 = NcDbLine::cast(object2);
-
+	
 	NcDbObject* object3;
-	AcDbObjectId thrdId = myObj.GetNextID(currId);
+	AcDbObjectId thrdId = myObj.GetNextID(currId); //next
 	Nano::ErrorStatus errorr2 = acdbOpenObject(object3, thrdId, kForWrite);
-	NcDbLine* pLine3 = NcDbLine::cast(object3);
-	AcDbObjectId* someId = new AcDbObjectId(); //нужный айди объекта, чтобы определить дугу
-	if (currId == *someId)
+
+	if (currId == myObj.vecId[6])
 	{
-		if (true)//вариант,когда линия-линия-дуга
-		{
-			return;
-		}
-		if (true)//вариант,когда линия-дуга-линия
-		{
-			return;
-		}
-		if (true)//вариант,когда дуга-линия-линия
-		{
-			return;
-		}
-		if (true)//вариант,когда линия-линия-линия
-		{
-			NcGePoint3d test1 = pLine->startPoint();
-			NcGePoint3d test2 = pLine->endPoint();
-			pLine2->setEndPoint(test1);
-			pLine3->setStartPoint(test2);
-		}
+		NcDbLine* pLine2 = NcDbLine::cast(object2);
+		NcDbArc* pLine3 = NcDbArc::cast(object3);
+
+		NcGePoint3d test1 = pLine->startPoint();
+		NcGePoint3d test2 = pLine->endPoint();
+		pLine2->setEndPoint(test1);
+		AcGePoint3d center = findCircleCenter(pLine->endPoint(), myObj.vecPoint[0], 110);
+		double startAngle = calculateFullAngle(center, pLine->endPoint());
+		double endAngle = calculateFullAngle(center, myObj.vecPoint[0]);
+		//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
+		pLine3->setCenter(center);
+		pLine3->setStartAngle(startAngle);
+		pLine3->setEndAngle(endAngle);
+		return;
 	}
+
+
+	
+
+	//айди посл лин = 6, дуги = 7, перв лин = 0
+	//AcDbObjectId* someId = new AcDbObjectId(); //нужный айди объекта, чтобы определить дугу
+	//if (currId == *someId)
+	//{
+	//	if (true)//вариант,когда линия-линия-дуга
+	//	{
+	//		return;
+	//	}
+	//	if (true)//вариант,когда линия-дуга-линия
+	//	{
+	//		return;
+	//	}
+	//	if (true)//вариант,когда дуга-линия-линия
+	//	{
+	//		return;
+	//	}
+	//	if (true)//вариант,когда линия-линия-линия
+	//	{
+	//		NcGePoint3d test1 = pLine->startPoint();
+	//		NcGePoint3d test2 = pLine->endPoint();
+	//		pLine2->setEndPoint(test1);
+	//		pLine3->setStartPoint(test2);
+	//	}
+	//}
 }
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity)
