@@ -54,6 +54,7 @@
 
 #pragma once
 #include "stdafx.h"
+#include "calcArc.h"
 
 namespace calcArc
 {
@@ -121,5 +122,25 @@ namespace calcArc
 		pointOnArc.z = center.z; // z-координата не изменяется, если дуга находится в плоскости XY
 
 		return pointOnArc;
+	}
+	void calcArc::remakeArc(AcDbArc* pArc, AcGePoint3d endAnglePoint, AcGePoint3d startAnglePoint)
+	{
+		int radius = pArc->radius();
+		while (true)
+		{
+			AcGePoint3d center = findCircleCenter(startAnglePoint, endAnglePoint, radius, -1);
+			double startAngle = calculateFullAngle(center, startAnglePoint);
+			double endAngle = calculateFullAngle(center, endAnglePoint);
+			//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
+			pArc->setCenter(center);
+			pArc->setStartAngle(startAngle);
+			pArc->setEndAngle(endAngle);
+			pArc->setRadius(radius);
+			if ((calculatePointOnArc(pArc->center(), radius, pArc->startAngle()) == startAnglePoint) &&
+				(calculatePointOnArc(pArc->center(), radius, pArc->endAngle()) == endAnglePoint))
+				break;
+			radius++;
+		}
+		return;
 	}
 };

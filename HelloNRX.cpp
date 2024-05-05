@@ -26,11 +26,8 @@ LineReactor* myReactor;
 void helloNrxCmd()
 {
 	//делаю контур
-
-	//storageObj myObj = storageObj();
 	for (int i = 0; i < myObj.vecId.size()-1; i++)
 	{
-
 		AcDbLine* pLine = new AcDbLine(myObj.vecPoint[i], myObj.vecPoint[i + 1]);
 		addToModelSpace(myObj.vecId[i], pLine);
 		pLine->addReactor(myReactor);
@@ -50,7 +47,7 @@ void helloNrxCmd()
 
 	AcDbArc* arc = new AcDbArc(center, radiusArc, startAngle, endAngle);
 
-	addToModelSpace(myObj.vecId[myObj.countPoint], arc);
+	addToModelSpace(myObj.vecId[myObj.countPoint], arc); //в данный момент countPoint=7
 	myObj.countPoint++;
 	arc->addReactor(myReactor);
 	arc->close();
@@ -58,8 +55,10 @@ void helloNrxCmd()
 
 void LineReactor::modified(const NcDbObject* object)
 {
+	//один из указателей = nullptr, но необходимо создать два, 
+	//птшмт проблемы с областями видимости
 	NcDbArc* pArc = NcDbArc::cast(object);
-	NcDbLine* pLine = NcDbLine::cast(object);
+	NcDbLine* mainObj = NcDbLine::cast(object);
 
 
 	if (myObj.countPoint <= 7)
@@ -67,7 +66,8 @@ void LineReactor::modified(const NcDbObject* object)
 
 	AcDbObjectId currId = object->id();
 
-
+	//нужно ли нам дальше редактировать обьекты?
+	//ведь modified вызывается для каждого обьекта, который изменяется
 	if (myObj.currId == nullptr)
 		myObj.currId = currId;
 	else
@@ -90,120 +90,63 @@ void LineReactor::modified(const NcDbObject* object)
 	AcDbObjectId thrdId = myObj.GetNextID(currId); //next
 	Nano::ErrorStatus errorr2 = acdbOpenObject(object3, thrdId, kForWrite);
 
+	//главный обьект - линия перед дугой
 	if (currId == myObj.vecId[6])
 	{
 		NcDbObject* object4;
 		AcDbObjectId frthId = myObj.vecId[0]; //next
 		Nano::ErrorStatus errorr2 = acdbOpenObject(object4, frthId, kForWrite);
 
-		NcDbLine* pLine2 = NcDbLine::cast(object2);
-		NcDbArc* pLine3 = NcDbArc::cast(object3);
-		NcDbLine* pLine4 = NcDbLine::cast(object4);
+		NcDbLine* prevObj = NcDbLine::cast(object2);
+		NcDbArc* nextObj = NcDbArc::cast(object3);
+		NcDbLine* extraObj = NcDbLine::cast(object4);
 
-		NcGePoint3d test1 = pLine->startPoint();
-		NcGePoint3d test2 = pLine->endPoint();
-		NcGePoint3d test3 = pLine4->startPoint();
-		pLine2->setEndPoint(test1);
-		int radius = 110;
-		while(true)
-		{
-			AcGePoint3d center = findCircleCenter(test2, test3, radius, -1);
-			double startAngle = calculateFullAngle(center, test2);
-			double endAngle = calculateFullAngle(center, test3);
-			//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
-			pLine3->setCenter(center);
-			pLine3->setStartAngle(startAngle);
-			pLine3->setEndAngle(endAngle);
-			pLine3->setRadius(radius);
-			if ((calculatePointOnArc(pLine3->center(), radius, pLine3->startAngle()) == pLine->endPoint()) && (calculatePointOnArc(pLine3->center(), radius, pLine3->endAngle()) == test3))
-			{
-				break;
-			}
-			radius++;
-		}
+		prevObj->setEndPoint(mainObj->startPoint());
+		
+		remakeArc(nextObj, extraObj->startPoint(), mainObj->endPoint());
 		return;
 	}
 
+	//главный обьект - линия после дуги
 	if (currId == myObj.vecId[0])
 	{
 		NcDbObject* object4;
 		AcDbObjectId frthId = myObj.vecId[6]; //next
 		Nano::ErrorStatus errorr2 = acdbOpenObject(object4, frthId, kForWrite);
 
-		NcDbLine* pLine3 = NcDbLine::cast(object3);
-		NcDbArc* pLine2 = NcDbArc::cast(object2);
-		NcDbLine* pLine4 = NcDbLine::cast(object4);
+		NcDbLine* nextObj = NcDbLine::cast(object3);
+		NcDbArc* prevObj = NcDbArc::cast(object2);
+		NcDbLine* extraObj = NcDbLine::cast(object4);
 
-		NcGePoint3d test1 = pLine->startPoint();
-		NcGePoint3d test2 = pLine->endPoint();
-		NcGePoint3d test3 = pLine4->endPoint();
-		pLine3->setStartPoint(test2);
+		nextObj->setStartPoint(mainObj->endPoint());
 
-
-		int radius = 110;
-		while (true)
-		{
-			AcGePoint3d center = findCircleCenter(test1, test3, radius, 1);
-			double startAngle = calculateFullAngle(center, test3);
-			double endAngle = calculateFullAngle(center, test1);
-			//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
-			pLine2->setCenter(center);
-			pLine2->setStartAngle(startAngle);
-			pLine2->setEndAngle(endAngle);
-			pLine2->setRadius(radius);
-			if ((calculatePointOnArc(pLine2->center(), radius, pLine2->startAngle()) == test3) &&
-				(calculatePointOnArc(pLine2->center(), radius, pLine2->endAngle()) == test1))
-			{
-				break;
-			}
-			radius++;
-		}
+		remakeArc(prevObj, mainObj->startPoint(), extraObj->endPoint());
 		return;
 	}
 
+	//главный обьект - дуга
 	if (currId == myObj.vecId[7])
 	{
-		NcDbLine* pLine2 = NcDbLine::cast(object2);
-		NcDbLine* pLine3 = NcDbLine::cast(object3);
+		NcDbLine* prevObj = NcDbLine::cast(object2);
+		NcDbLine* nextObj = NcDbLine::cast(object3);
 		
-		pLine2->setEndPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->startAngle()));
-		pLine3->setStartPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->endAngle()));
+		prevObj->setEndPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->startAngle()));
+		nextObj->setStartPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->endAngle()));
 		return;
 	}
+
+
+	//главный обьект - линия не рядом с дугой
 	else
 	{
-		NcDbLine* pLine2 = NcDbLine::cast(object2);
-		NcDbLine* pLine3 = NcDbLine::cast(object3);
+		NcDbLine* prevObj = NcDbLine::cast(object2);
+		NcDbLine* nextObj = NcDbLine::cast(object3);
 
-		NcGePoint3d test1 = pLine->startPoint();
-		NcGePoint3d test2 = pLine->endPoint();
-		pLine2->setEndPoint(test1);
-		pLine3->setStartPoint(test2);
+		NcGePoint3d test1 = mainObj->startPoint();
+		NcGePoint3d test2 = mainObj->endPoint();
+		prevObj->setEndPoint(test1);
+		nextObj->setStartPoint(test2);
 	}
-
-	
-
-	//айди посл лин = 6, дуги = 7, перв лин = 0
-	//AcDbObjectId* someId = new AcDbObjectId(); //нужный айди объекта, чтобы определить дугу
-	//if (currId == *someId)
-	//{
-	//	if (true)//вариант,когда линия-линия-дуга
-	//	{
-	//		return;
-	//	}
-	//	if (true)//вариант,когда линия-дуга-линия
-	//	{
-	//		return;
-	//	}
-	//	if (true)//вариант,когда дуга-линия-линия
-	//	{
-	//		return;
-	//	}
-	//	if (true)//вариант,когда линия-линия-линия
-	//	{
-	//		
-	//	}
-	//}
 }
 
 void addToModelSpace(AcDbObjectId& objId, AcDbEntity* pEntity)

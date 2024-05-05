@@ -10,4 +10,7 @@ namespace calcArc
     
     //дает координаты угла на дуге эщкере
 	AcGePoint3d calculatePointOnArc(AcGePoint3d center, double radius, double angleRadians);
+
+	//подбирает свойства дуги, чтобы она совпадала с точками
+	void remakeArc(AcDbArc* pArc, AcGePoint3d endAnglePoint, AcGePoint3d startAnglePoint);
 };
