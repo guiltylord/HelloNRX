@@ -141,32 +141,23 @@ void LineReactor::modified(const NcDbObject* object)
 
 
 		int radius = 110;
-		AcGePoint3d center = findCircleCenter(test2, test3, radius, -1);
-		double startAngle = calculateFullAngle(center, test3);
-		double endAngle = calculateFullAngle(center, test1);
-		//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
-		pLine2->setCenter(center);
-		pLine2->setStartAngle(startAngle);
-		pLine2->setEndAngle(endAngle);
-		pLine2->setRadius(radius);
-		//need fix
-	
-		//while (true)
-		//{
-		//	AcGePoint3d center = findCircleCenter(test2, test3, radius, -1);
-		//	double startAngle = calculateFullAngle(center, test3);
-		//	double endAngle = calculateFullAngle(center, test1);
-		//	//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
-		//	pLine2->setCenter(center);
-		//	pLine2->setStartAngle(startAngle);
-		//	pLine2->setEndAngle(endAngle);
-		//	pLine2->setRadius(radius);
-		//	if ((calculatePointOnArc(pLine2->center(), radius, pLine2->startAngle()) == pLine4->endPoint()) && (calculatePointOnArc(pLine2->center(), radius, pLine2->endAngle()) == test1))
-		//	{
-		//		break;
-		//	}
-		//	radius++;
-		//}
+		while (true)
+		{
+			AcGePoint3d center = findCircleCenter(test1, test3, radius, 1);
+			double startAngle = calculateFullAngle(center, test3);
+			double endAngle = calculateFullAngle(center, test1);
+			//AcDbArc* arc = new AcDbArc(center, 110, startAngle, endAngle);
+			pLine2->setCenter(center);
+			pLine2->setStartAngle(startAngle);
+			pLine2->setEndAngle(endAngle);
+			pLine2->setRadius(radius);
+			if ((calculatePointOnArc(pLine2->center(), radius, pLine2->startAngle()) == test3) &&
+				(calculatePointOnArc(pLine2->center(), radius, pLine2->endAngle()) == test1))
+			{
+				break;
+			}
+			radius++;
+		}
 		return;
 	}
 
@@ -175,8 +166,8 @@ void LineReactor::modified(const NcDbObject* object)
 		NcDbLine* pLine2 = NcDbLine::cast(object2);
 		NcDbLine* pLine3 = NcDbLine::cast(object3);
 		
-		pLine2->setEndPoint(calculatePointOnArc(pArc->center(), 110, pArc->startAngle()));
-		pLine3->setStartPoint(calculatePointOnArc(pArc->center(), 110, pArc->endAngle()));
+		pLine2->setEndPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->startAngle()));
+		pLine3->setStartPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->endAngle()));
 		return;
 	}
 	else
