@@ -26,7 +26,7 @@ LineReactor* myReactor;
 void helloNrxCmd()
 {
 	//делаю контур
-	for (int i = 0; i < myObj.vecId.size()-1; i++)
+	for (int i = 0; i < myObj.vecId.size() - 1; i++)
 	{
 		AcDbLine* pLine = new AcDbLine(myObj.vecPoint[i], myObj.vecPoint[i + 1]);
 		addToModelSpace(myObj.vecId[i], pLine);
@@ -48,9 +48,12 @@ void helloNrxCmd()
 	AcDbArc* arc = new AcDbArc(center, radiusArc, startAngle, endAngle);
 
 	addToModelSpace(myObj.vecId[myObj.countPoint], arc); //в данный момент countPoint=7
-	myObj.countPoint++;
+
 	arc->addReactor(myReactor);
+	myObj.countPoint++;
+	myObj.countPoint++;
 	arc->close();
+	myObj.currId = nullptr;
 }
 
 void LineReactor::modified(const NcDbObject* object)
@@ -61,11 +64,10 @@ void LineReactor::modified(const NcDbObject* object)
 	NcDbLine* mainObj = NcDbLine::cast(object);
 
 
-	if (myObj.countPoint <= 7)
+	if (myObj.countPoint <= 8)
 		return;
 
 	AcDbObjectId currId = object->id();
-
 	//нужно ли нам дальше редактировать обьекты?
 	//ведь modified вызывается для каждого обьекта, который изменяется
 	if (myObj.currId == nullptr)
@@ -102,7 +104,7 @@ void LineReactor::modified(const NcDbObject* object)
 		NcDbLine* extraObj = NcDbLine::cast(object4);
 
 		prevObj->setEndPoint(mainObj->startPoint());
-		
+
 		remakeArc(nextObj, extraObj->startPoint(), mainObj->endPoint());
 		return;
 	}
@@ -129,7 +131,7 @@ void LineReactor::modified(const NcDbObject* object)
 	{
 		NcDbLine* prevObj = NcDbLine::cast(object2);
 		NcDbLine* nextObj = NcDbLine::cast(object3);
-		
+
 		prevObj->setEndPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->startAngle()));
 		nextObj->setStartPoint(calculatePointOnArc(pArc->center(), pArc->radius(), pArc->endAngle()));
 		return;

@@ -112,7 +112,7 @@ namespace calcArc
 
 		return center;
 	}
-	
+
 	AcGePoint3d calculatePointOnArc(AcGePoint3d center, double radius, double angleRadians)
 	{
 		// Вычисление декартовых координат для точки на окружности
